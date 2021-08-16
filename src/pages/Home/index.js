@@ -1,27 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BlogItem, Button, Gap } from '../../components';
 import './home.scss';
 import { useHistory } from 'react-router-dom';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { setDataBlog } from '../../config/Redux/action';
 
 const Home = () => {
-    const [dataBlog, setDataBlog] = useState([]);
+    const [counter, setCounter] = useState(1);
+    const {dataBlog, page} = useSelector(state => state.homeReducer)
+    const dispatch = useDispatch()
 
+    console.log(page);  
     useEffect(() => {
-        axios
-            .get('http://localhost:4000/v1/blog/posts?page=2$perPage=5')
-            .then((result) => {
-                console.log('data API', result.data);
-                const responseAPI = result.data;
-
-                setDataBlog(responseAPI.data);
-            })
-            .catch((err) => {
-                console.log('errornya', err);
-            });
-    }, []);
+        dispatch(setDataBlog(counter));
+    }, [counter, dispatch]);
 
     const history = useHistory();
+
+    const previous = () => {
+        setCounter(counter <= 1 ? 1 : counter - 1)
+        console.log(counter);
+    }
+
+    const next = () => {
+        setCounter(counter === page.totalPage ? page.totalPage : counter + 1)
+        console.log(counter);
+    }
 
     return (
         <div className='home-page-wrapper'>
@@ -31,6 +35,7 @@ const Home = () => {
                     onClick={() => history.push('/create-blog')}
                 />
             </div>
+            {/* <p>{name}</p> */}
             <Gap height={20} />
             <div className='content-wrapper'>
                 {dataBlog.map((blog) => {
@@ -47,9 +52,11 @@ const Home = () => {
                 })}
             </div>
             <div className='pagination'>
-                <Button title='Previous' />
+                <Button title='Previous' onClick={previous} />
                 <Gap width={20} />
-                <Button title='Next' />
+                <p className="text-page">{page.currentPage} / {page.totalPage}</p>
+                <Gap width={20} />
+                <Button title='Next' onClick={next} />
             </div>
             <Gap height={20} />
         </div>

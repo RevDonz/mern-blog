@@ -1,5 +1,4 @@
 import React from 'react'
-import { RegisterBg } from '../../../assets'
 import './blogitem.scss'
 import { useHistory } from 'react-router-dom'
 import { Button, Gap } from '../../atoms'
